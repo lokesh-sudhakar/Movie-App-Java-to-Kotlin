@@ -26,7 +26,7 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.CustomView
     private ListItemClickListener mOnClickListener;
 
     public interface ListItemClickListener {
-        void onListItemClick(int clickedItemIndex);
+        void onListItemClick(int clickedItemIndex,List<MovieResult.Result> dataList);
     }
 
     public CustomAdapter(Context context,List<MovieResult.Result> dataList,ListItemClickListener listener){
@@ -52,7 +52,7 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.CustomView
 
         @Override
         public void onClick(View v) {
-            mOnClickListener.onListItemClick(getAdapterPosition());
+            mOnClickListener.onListItemClick(getAdapterPosition(), dataList);
         }
     }
 

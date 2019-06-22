@@ -125,8 +125,8 @@ public class MovieResult {
             this.video = video;
         }
 
-        public Double getVoteAverage() {
-            return voteAverage;
+        public float getVoteAverage() {
+            return voteAverage.floatValue();
         }
 
         public void setVoteAverage(Double voteAverage) {

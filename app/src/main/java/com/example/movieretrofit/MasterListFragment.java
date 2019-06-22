@@ -2,6 +2,7 @@ package com.example.movieretrofit;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,6 +16,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.io.Serializable;
 import java.util.List;
 
 import adapter.CustomAdapter;
@@ -32,7 +34,6 @@ public class MasterListFragment extends Fragment implements CustomAdapter.ListIt
     RecyclerView recyclerView;
     CustomAdapter adapter;
     private static final String BASE_URL = "https://api.themoviedb.org";
-    ProgressDialog progressDialog;
     private static String CATEGORY = "popular";
     private static String API_KEY = "c4fd0359f29736975ba764defb5f2878";
     private static String LANGUAGE = "en-US";
@@ -83,13 +84,21 @@ public class MasterListFragment extends Fragment implements CustomAdapter.ListIt
     private void generateDataList(View view, List<MovieResult.Result> movieList) {
         recyclerView = view.findViewById(R.id.customRecyclerView);
         adapter = new CustomAdapter(context,  movieList,this);
-//        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(MainActivity.this);
         recyclerView.setLayoutManager(new GridLayoutManager(context,2));
         recyclerView.setAdapter(adapter);
     }
 
     @Override
-    public void onListItemClick(int clickedItemIndex) {
-        Toast.makeText(context, "the position clicked is"+clickedItemIndex, Toast.LENGTH_SHORT).show();
+    public void onListItemClick(int clickedItemIndex,List<MovieResult.Result> movieList) {
+
+        Bundle bundle = new Bundle();
+        bundle.putInt("item_position",clickedItemIndex);
+
+        // Attach the Bundle to an intent
+        Intent intent = new Intent(context, MovieDetailActivity.class);
+        intent.putExtra("data_list", (Serializable) movieList);
+        intent.putExtras(bundle);
+        startActivity(intent);
+        Toast.makeText(context, "the position clicked is"+clickedItemIndex+"fragment ", Toast.LENGTH_SHORT).show();
     }
 }
