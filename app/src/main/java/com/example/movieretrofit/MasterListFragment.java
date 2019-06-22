@@ -26,7 +26,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 import static android.provider.MediaStore.Video.VideoColumns.CATEGORY;
 
-public class MasterListFragment extends Fragment {
+public class MasterListFragment extends Fragment implements CustomAdapter.ListItemClickListener{
 
 
     RecyclerView recyclerView;
@@ -82,10 +82,14 @@ public class MasterListFragment extends Fragment {
     }
     private void generateDataList(View view, List<MovieResult.Result> movieList) {
         recyclerView = view.findViewById(R.id.customRecyclerView);
-        adapter = new CustomAdapter(context,  movieList);
+        adapter = new CustomAdapter(context,  movieList,this);
 //        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(MainActivity.this);
         recyclerView.setLayoutManager(new GridLayoutManager(context,2));
         recyclerView.setAdapter(adapter);
     }
 
+    @Override
+    public void onListItemClick(int clickedItemIndex) {
+        Toast.makeText(context, "the position clicked is"+clickedItemIndex, Toast.LENGTH_SHORT).show();
+    }
 }

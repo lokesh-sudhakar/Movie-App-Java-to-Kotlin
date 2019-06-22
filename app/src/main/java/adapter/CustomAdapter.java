@@ -23,14 +23,19 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.CustomView
 
     private List<MovieResult.Result> dataList;
     private Context context;
+    private ListItemClickListener mOnClickListener;
 
-    public CustomAdapter(Context context,List<MovieResult.Result> dataList){
+    public interface ListItemClickListener {
+        void onListItemClick(int clickedItemIndex);
+    }
+
+    public CustomAdapter(Context context,List<MovieResult.Result> dataList,ListItemClickListener listener){
         this.context = context;
+        this.mOnClickListener = listener;
         this.dataList = dataList;
     }
 
-    class CustomViewHolder extends RecyclerView.ViewHolder {
-
+    class CustomViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public final View mView;
 
         TextView txtTitle;
@@ -42,6 +47,12 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.CustomView
 
             txtTitle = mView.findViewById(R.id.title);
             coverImage = mView.findViewById(R.id.coverImage);
+            itemView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            mOnClickListener.onListItemClick(getAdapterPosition());
         }
     }
 
@@ -56,6 +67,7 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.CustomView
     public void onBindViewHolder(CustomViewHolder holder, int position) {
 
         holder.txtTitle.setText(dataList.get(position).getTitle());
+
 
 //        holder.coverImage.setImageResource(R.drawable.ic_launcher_background);
         Picasso.Builder builder = new Picasso.Builder(context);
