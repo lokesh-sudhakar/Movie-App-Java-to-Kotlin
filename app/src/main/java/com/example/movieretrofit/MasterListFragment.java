@@ -1,5 +1,6 @@
 package com.example.movieretrofit;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -7,66 +8,84 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import java.util.List;
+
+import adapter.CustomAdapter;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+
+import static android.provider.MediaStore.Video.VideoColumns.CATEGORY;
 
 public class MasterListFragment extends Fragment {
 
-//    // Define a new interface OnImageClickListener that triggers a callback in the host activity
-//    OnImageClickListener mCallback;
-//
-//    // OnImageClickListener interface, calls a method in the host activity named onImageSelected
-//    public interface OnImageClickListener {
-//        void onImageSelected(int position);
-//    }
-//
-//    // Override onAttach to make sure that the container activity has implemented the callback
-//    @Override
-//    public void onAttach(Context context) {
-//        super.onAttach(context);
-//
-//        // This makes sure that the host activity has implemented the callback interface
-//        // If not, it throws an exception
-//        try {
-//            mCallback = (OnImageClickListener) context;
-//        } catch (ClassCastException e) {
-//            throw new ClassCastException(context.toString()
-//                    + " must implement OnImageClickListener");
-//        }
-//    }
-//
-//    // Mandatory empty constructor
-//    public MasterListFragment() {
-//    }
-//
-//    // Inflates the GridView of all AndroidMe images
-//    @Override
-//    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-//                             Bundle savedInstanceState) {
-//
-//        final View rootView = inflater.inflate(R.layout.fragment_master_list, container, false);
-//
-//        // Get a reference to the GridView in the fragment_master_list xml layout file
-//        GridView gridView = (GridView) rootView.findViewById(R.id.images_grid_view);
-//
-//        // Create the adapter
-//        // This adapter takes in the context and an ArrayList of ALL the image resources to display
-//        MasterListAdapter mAdapter = new MasterListAdapter(getContext(), AndroidImageAssets.getAll());
-//
-//        // Set the adapter on the GridView
-//        gridView.setAdapter(mAdapter);
-//
-//        // Set a click listener on the gridView and trigger the callback onImageSelected when an item is clicked
-//        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-//                // Trigger the callback method and pass in the position that was clicked
-//                mCallback.onImageSelected(position);
-//            }
-//        });
-//
-//        // Return the root view
-//        return rootView;
-//    }
+
+    RecyclerView recyclerView;
+    CustomAdapter adapter;
+    private static final String BASE_URL = "https://api.themoviedb.org";
+    ProgressDialog progressDialog;
+    private static String CATEGORY = "popular";
+    private static String API_KEY = "c4fd0359f29736975ba764defb5f2878";
+    private static String LANGUAGE = "en-US";
+    private static int PAGE = 1;
+    private Context context;
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        this.context = context;
+    }
+
+    // Mandatory empty constructor
+    public MasterListFragment() {
+    }
+
+    // Inflates the GridView of all AndroidMe images
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+
+        final View rootView = inflater.inflate(R.layout.fragment_master_list, container, false);
+        Retrofit retrofit = new retrofit2.Retrofit.Builder()
+                .baseUrl(BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        RetroFitInterface retroFitInterface = retrofit.create(RetroFitInterface.class);
+
+
+        Call<MovieResult> call = retroFitInterface.getMovies(CATEGORY,API_KEY,LANGUAGE,PAGE);
+        call.enqueue(new Callback<MovieResult>() {
+            @Override
+            public void onResponse(Call<MovieResult> call, Response<MovieResult> response) {
+//               progressDialog.dismiss();
+                MovieResult movies = response.body();
+                List<MovieResult.Result> movieList = movies.getResults();
+                generateDataList(rootView,movieList);
+            }
+
+            @Override
+            public void onFailure(Call<MovieResult> call, Throwable t) {
+                t.printStackTrace();
+                Toast.makeText(context, "Something went wrong...Please try later!", Toast.LENGTH_SHORT).show();
+            }
+        });
+        return rootView;
+    }
+    private void generateDataList(View view, List<MovieResult.Result> movieList) {
+        recyclerView = view.findViewById(R.id.customRecyclerView);
+        adapter = new CustomAdapter(context,  movieList);
+//        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(MainActivity.this);
+        recyclerView.setLayoutManager(new GridLayoutManager(context,2));
+        recyclerView.setAdapter(adapter);
+    }
 
 }
