@@ -60,6 +60,7 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.CustomView
     public CustomViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
         View view = layoutInflater.inflate(R.layout.movie_poster, parent, false);
+        ;
         return new CustomViewHolder(view);
     }
 
@@ -68,8 +69,6 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.CustomView
 
         holder.txtTitle.setText(dataList.get(position).getTitle());
 
-
-//        holder.coverImage.setImageResource(R.drawable.ic_launcher_background);
         Picasso.Builder builder = new Picasso.Builder(context);
         builder.downloader(new OkHttp3Downloader(context));
         builder.build().load("https://image.tmdb.org/t/p/w185/"+dataList.get(position).getPosterPath())

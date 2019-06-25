@@ -1,29 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+
+<FrameLayout android:id="@+id/movie_details_container"
+    android:name="com.example.movieretrofit.MovieDetailFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.movieretrofit.MovieDetailActivity">
-
-    <!-- LinearLayout for holding three Android-Me images -->
-    <LinearLayout
-        android:id="@+id/android_me_linear_layout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@android:color/white"
-        android:orientation="vertical"
-        >
-
-        <FrameLayout android:id="@+id/movie_details_container"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scaleType="centerInside"/>
-    </LinearLayout>
-</ScrollView>
-<!--<fragment-->
-    <!--xmlns:android="http://schemas.android.com/apk/res/android"-->
-    <!--android:id="@+id/master_list_fragment"-->
-    <!--android:name="com.example.movieretrofit.MovieDetailFragment"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="match_parent" />-->
+    android:scaleType="centerInside"
+    xmlns:android="http://schemas.android.com/apk/res/android" />

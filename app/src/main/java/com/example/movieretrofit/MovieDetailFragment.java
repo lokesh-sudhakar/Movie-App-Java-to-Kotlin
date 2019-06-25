@@ -1,7 +1,7 @@
 package com.example.movieretrofit;
 
 
-import android.annotation.SuppressLint;
+//import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -21,6 +21,7 @@ import androidx.fragment.app.Fragment;
 import com.jakewharton.picasso.OkHttp3Downloader;
 import com.squareup.picasso.Picasso;
 
+import java.io.Serializable;
 import java.util.List;
 
 import butterknife.BindView;
@@ -85,18 +86,17 @@ public class MovieDetailFragment extends Fragment {
         this.context = context;
     }
 
-    @SuppressLint("CutPasteId")
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.movie_detail_fragment, container, false);
         ButterKnife.bind(this, rootView);
 
-
-//        if(savedInstanceState!=null){
-//            setDataList((List<MovieResult.Result>) savedInstanceState.getSerializable("data_list"));
-//            setPosition(savedInstanceState.getInt("item_position", 0));
-//        }
+        if(savedInstanceState!=null){
+            setDataList((List<MovieResult.Result>) savedInstanceState.getSerializable("data_list"));
+            setPosition(savedInstanceState.getInt("item_position", 0));
+        }
 //        movieTitleOnPoster = (TextView) rootView.findViewById(R.id.movie_title_on_poster);
 //        movieTitleBelowPoster = (TextView) rootView.findViewById(R.id.movie_title_below_poster);
 //        releaseYearView = (TextView) rootView.findViewById(R.id.release_year_view);
@@ -114,7 +114,7 @@ public class MovieDetailFragment extends Fragment {
 //        call.enqueue(new Callback<MovieResult>() {
 //            @Override
 //            public void onResponse(Call<MovieResult> call, Response<MovieResult> response) {
-////               progressDialog.dismiss();
+//
 //                MovieResult movies = response.body();
 //                List<MovieResult.Result> movieList = movies.getResults();
 //                // Toast.makeText(context, "Something went right...Please try later!", Toast.LENGTH_SHORT).show();
@@ -123,17 +123,16 @@ public class MovieDetailFragment extends Fragment {
 //                setPosition(0);
                 movieTitleOnPoster.setText(getDataList().get(getPosition()).getTitle());
                 movieTitleBelowPoster.setText(getDataList().get(getPosition()).getTitle());
-                releaseYearView.setText(getDataList().get(getPosition()).getReleaseDate());
+                releaseYearView.setText(getDataList().get(getPosition()).getReleaseDate().substring(0,4));
                 ratingBar.setRating(getDataList().get(getPosition()).getVoteAverage());
                 summary.setText(getDataList().get(getPosition()).getOverview());
                 Picasso.Builder builder = new Picasso.Builder(context);
                 builder.downloader(new OkHttp3Downloader(context));
-                builder.build().load("https://image.tmdb.org/t/p/w185/" + getDataList().get(getPosition()).getPosterPath())
+                builder.build().load("https://image.tmdb.org/t/p/w185/" + getDataList().get(getPosition()).getBackdropPath())
                         .into(moviePoster);
 //                Toast.makeText(context, "result movie is " + getDataList().get(getPosition()).getTitle(), Toast.LENGTH_SHORT).show();
-//
+
 //            }
-//
 //            @Override
 //            public void onFailure(Call<MovieResult> call, Throwable t) {
 //                t.printStackTrace();
@@ -155,9 +154,9 @@ public class MovieDetailFragment extends Fragment {
 
         return rootView;
     }
-//    @Override
-//    public void onSaveInstanceState(Bundle currentState) {
-//        currentState.putSerializable("data_list", (Serializable) dataList);
-//        currentState.putInt("item_position",position);
-//    }
+    @Override
+    public void onSaveInstanceState(Bundle currentState) {
+        currentState.putSerializable("data_list", (Serializable) dataList);
+        currentState.putInt("item_position",position);
+    }
 }

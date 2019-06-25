@@ -1,9 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-
-    <fragment
+<fragment
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/master_list_fragment"
         android:name="com.example.movieretrofit.MasterListFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
+
+<!--<FrameLayout android:id="@+id/movie_list_container"-->
+<!--android:name="com.example.movieretrofit.MasterListFragment"-->
+<!--android:layout_width="match_parent"-->
+<!--android:layout_height="match_parent"-->
+<!--android:scaleType="centerInside"-->
+<!--xmlns:android="http://schemas.android.com/apk/res/android" />-->

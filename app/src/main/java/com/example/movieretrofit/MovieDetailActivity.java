@@ -37,8 +37,6 @@ public class MovieDetailActivity extends AppCompatActivity {
 
             movieDetailFragment.setDataList((List<MovieResult.Result>) getIntent().getSerializableExtra("data_list"));
             movieDetailFragment.setPosition(getIntent().getIntExtra("item_position", 0));
-//            movieDetailFragment.setDataList(movieList);
-//            movieDetailFragment.setPosition(0);
             FragmentManager fragmentManager = getSupportFragmentManager();
 
             fragmentManager.beginTransaction().add(R.id.movie_details_container, movieDetailFragment).commit();
