@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Movie;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -25,7 +26,10 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.movieretrofit.MovieResult.Result;
+
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import adapter.CustomAdapter;
@@ -41,7 +45,7 @@ import static android.provider.MediaStore.Video.VideoColumns.CATEGORY;
 
 public class MasterListFragment extends Fragment implements MoviePageListadapter.ListItemClickListener{
 
-    PagedList<MovieResult.Result> movies;
+    PagedList<Result> movies;
     MovieViewModel movieViewModel;
     RecyclerView recyclerView;
     MoviePageListadapter movieAdapter;
@@ -54,15 +58,15 @@ public class MasterListFragment extends Fragment implements MoviePageListadapter
     private static int PAGE = 1;
     private Context context;
 
-    public List<MovieResult.Result> getMovieList() {
+    public List<Result> getMovieList() {
         return movieList;
     }
 
-    public void setMovieList(List<MovieResult.Result> movieList) {
+    public void setMovieList(List<Result> movieList) {
         this.movieList = movieList;
     }
 
-    private List<MovieResult.Result> movieList;
+    private List<Result> movieList;
 
     @Override
     public void onAttach(Context context) {
@@ -88,10 +92,10 @@ public class MasterListFragment extends Fragment implements MoviePageListadapter
         final View rootView = inflater.inflate(R.layout.fragment_master_list, container, false);
         movieViewModel= ViewModelProviders.of(this).get(MovieViewModel.class);
 
-        //movieViewModel.setCategory("top_rated");
-        movieViewModel.getMoviesPagedList().observe(this, new Observer<PagedList<MovieResult.Result>>() {
+
+        movieViewModel.getMoviesPagedList().observe(this, new Observer<PagedList<Result>>() {
             @Override
-            public void onChanged( PagedList<MovieResult.Result> moviesFromLiveData) {
+            public void onChanged( PagedList<Result> moviesFromLiveData) {
                 movies=moviesFromLiveData;
                 showOnRecyclerView(rootView);
             }
@@ -103,9 +107,9 @@ public class MasterListFragment extends Fragment implements MoviePageListadapter
         movieViewModel= ViewModelProviders.of(this).get(MovieViewModel.class);
 
         movieViewModel.setCategory(category);
-        movieViewModel.getMoviesPagedList().observe(this, new Observer<PagedList<MovieResult.Result>>() {
+        movieViewModel.getMoviesPagedList().observe(this, new Observer<PagedList<Result>>() {
             @Override
-            public void onChanged( PagedList<MovieResult.Result> moviesFromLiveData) {
+            public void onChanged( PagedList<Result> moviesFromLiveData) {
                 movies=moviesFromLiveData;
                 showOnRecyclerView(rootView);
             }
@@ -198,8 +202,15 @@ public class MasterListFragment extends Fragment implements MoviePageListadapter
     @Override
     public void onListItemClick(int position) {
         Toast.makeText(context, "the position"+movies.get(position).getTitle()+" clicked is  "+position, Toast.LENGTH_SHORT).show();
-//        Intent intent = new Intent(context, MovieDetailActivity.class);
-//        intent.putExtra("movies", (Serializable) movies);
-//        startActivity(intent);
+        Result movie= movies.get(position);
+
+        Bundle bundle = new Bundle();
+        bundle.putInt("item_position",position);
+        bundle.putSerializable("movie",movie);
+        Intent intent = new Intent(context, MovieDetailActivity.class);
+//        intent.putExtra("data_list", movie);
+        intent.putExtras(bundle);
+        startActivity(intent);
+        Toast.makeText(context, "the position clicked is"+position+"fragment ", Toast.LENGTH_SHORT).show();
     }
 }

@@ -23,6 +23,24 @@
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
             app:toolbarId="@+id/toolbar">
 
+            <ImageView
+                android:id="@+id/movie_poster"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="fitXY"
+                />
+            <TextView
+                android:id="@+id/movie_title_on_poster"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="20dp"
+                android:text="TextView"
+                android:paddingBottom="20dp"
+                android:textSize="22sp"
+                android:textColor="#ffffff"
+                android:layout_gravity="bottom"
+                />
+
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"

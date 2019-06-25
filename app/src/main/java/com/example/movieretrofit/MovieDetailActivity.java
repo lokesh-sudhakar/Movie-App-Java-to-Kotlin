@@ -2,6 +2,7 @@ package com.example.movieretrofit;
 
 import android.app.ProgressDialog;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -34,13 +35,11 @@ public class MovieDetailActivity extends AppCompatActivity {
 
 
             MovieDetailFragment movieDetailFragment = new MovieDetailFragment();
-
-            movieDetailFragment.setDataList((List<MovieResult.Result>) getIntent().getSerializableExtra("data_list"));
-            movieDetailFragment.setPosition(getIntent().getIntExtra("item_position", 0));
+            movieDetailFragment.setMovie((MovieResult.Result)getIntent().getExtras().getSerializable("movie"));
+            movieDetailFragment.getMovie();
+            Log.d("getmovie",""+movieDetailFragment.getMovie().getTitle());
             FragmentManager fragmentManager = getSupportFragmentManager();
-
             fragmentManager.beginTransaction().add(R.id.movie_details_container, movieDetailFragment).commit();
-
     }
 
 }

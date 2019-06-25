@@ -3,9 +3,7 @@ package com.example.movieretrofit;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-/**
- * Created by K. A. ANUSHKA MADUSANKA on 7/9/2018.
- */
+
 public class RetrofitInstance {
 
     private static Retrofit retrofit = null;

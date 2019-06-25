@@ -2,6 +2,7 @@ package com.example.movieretrofit;
 
 
 //import android.annotation.SuppressLint;
+import androidx.appcompat.widget.Toolbar;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -10,14 +11,17 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
-import android.widget.Toast;
-import android.widget.VideoView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.Guideline;
 import androidx.fragment.app.Fragment;
 
+import com.google.android.material.appbar.AppBarLayout;
+import com.google.android.material.appbar.CollapsingToolbarLayout;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
 import com.jakewharton.picasso.OkHttp3Downloader;
 import com.squareup.picasso.Picasso;
 
@@ -26,11 +30,6 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MovieDetailFragment extends Fragment {
     private static final String BASE_URL = "https://api.themoviedb.org";
@@ -40,13 +39,9 @@ public class MovieDetailFragment extends Fragment {
     private static int PAGE = 1;
 
 
-
-
     Guideline guideline2;
     @BindView(R.id.movie_poster)
     ImageView moviePoster;
-    @BindView(R.id.movie_title_on_poster)
-    TextView movieTitleOnPoster;
     @BindView(R.id.release_year_view)
     TextView releaseYearView;
     @BindView(R.id.movie_title_below_poster)
@@ -55,6 +50,16 @@ public class MovieDetailFragment extends Fragment {
     RatingBar ratingBar;
     @BindView(R.id.summary)
     TextView summary;
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
+    @BindView(R.id.toolbar_layout)
+    CollapsingToolbarLayout toolbarLayout;
+    @BindView(R.id.app_bar)
+    AppBarLayout appBar;
+    @BindView(R.id.Synopsis)
+    TextView Synopsis;
+    @BindView(R.id.fab)
+    FloatingActionButton fab;
 
     public MovieDetailFragment() {
     }
@@ -78,6 +83,16 @@ public class MovieDetailFragment extends Fragment {
     private List<MovieResult.Result> dataList;
     private int position;
 
+    public MovieResult.Result getMovie() {
+        return movie;
+    }
+
+    public void setMovie(MovieResult.Result movie) {
+        this.movie = movie;
+    }
+
+    private MovieResult.Result movie;
+
     private Context context;
 
     @Override
@@ -93,70 +108,48 @@ public class MovieDetailFragment extends Fragment {
         final View rootView = inflater.inflate(R.layout.movie_detail_fragment, container, false);
         ButterKnife.bind(this, rootView);
 
-        if(savedInstanceState!=null){
+        if (savedInstanceState != null) {
             setDataList((List<MovieResult.Result>) savedInstanceState.getSerializable("data_list"));
             setPosition(savedInstanceState.getInt("item_position", 0));
         }
-//        movieTitleOnPoster = (TextView) rootView.findViewById(R.id.movie_title_on_poster);
-//        movieTitleBelowPoster = (TextView) rootView.findViewById(R.id.movie_title_below_poster);
-//        releaseYearView = (TextView) rootView.findViewById(R.id.release_year_view);
-//        ratingBar = (RatingBar) rootView.findViewById(R.id.rating_bar);
-//        summary = (TextView) rootView.findViewById(R.id.release_year_view);
-//        moviePoster = (ImageView) rootView.findViewById(R.id.movie_poster);
-//        Retrofit retrofit = new Retrofit.Builder()
-//                .baseUrl(BASE_URL)
-//                .addConverterFactory(GsonConverterFactory.create())
-//                .build();
-//        RetroFitInterface retroFitInterface = retrofit.create(RetroFitInterface.class);
-//
-//
-//        Call<MovieResult> call = retroFitInterface.getMovies(CATEGORY, API_KEY, LANGUAGE, PAGE);
-//        call.enqueue(new Callback<MovieResult>() {
-//            @Override
-//            public void onResponse(Call<MovieResult> call, Response<MovieResult> response) {
-//
-//                MovieResult movies = response.body();
-//                List<MovieResult.Result> movieList = movies.getResults();
-//                // Toast.makeText(context, "Something went right...Please try later!", Toast.LENGTH_SHORT).show();
-//                setDataList(movieList);
-//
-//                setPosition(0);
-                movieTitleOnPoster.setText(getDataList().get(getPosition()).getTitle());
-                movieTitleBelowPoster.setText(getDataList().get(getPosition()).getTitle());
-                releaseYearView.setText(getDataList().get(getPosition()).getReleaseDate().substring(0,4));
-                ratingBar.setRating(getDataList().get(getPosition()).getVoteAverage());
-                summary.setText(getDataList().get(getPosition()).getOverview());
-                Picasso.Builder builder = new Picasso.Builder(context);
-                builder.downloader(new OkHttp3Downloader(context));
-                builder.build().load("https://image.tmdb.org/t/p/w185/" + getDataList().get(getPosition()).getBackdropPath())
-                        .into(moviePoster);
-//                Toast.makeText(context, "result movie is " + getDataList().get(getPosition()).getTitle(), Toast.LENGTH_SHORT).show();
 
-//            }
-//            @Override
-//            public void onFailure(Call<MovieResult> call, Throwable t) {
-//                t.printStackTrace();
-//                Toast.makeText(context, "Something went wrong...Please try later!", Toast.LENGTH_SHORT).show();
-//            }
-//        });
+        toolbar.setNavigationIcon(R.drawable.ic_arrow_back_black_24dp);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getActivity().onBackPressed();
+            }
+        });
+        toolbar.setTitle(movie.getTitle());
+        FloatingActionButton fab = (FloatingActionButton) rootView.findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+            }
+        });
 
-//        MovieResult.Result movie = getDataList().get(getPosition());
-//        movieTitleOnPoster.setText(getDataList().get(getPosition()).getTitle());
-//        movieTitleBelowPoster.setText(getDataList().get(getPosition()).getTitle());
-//        releaseYearView.setText(getDataList().get(getPosition()).getReleaseDate());
-//        ratingBar.setRating(getDataList().get(getPosition()).getVoteAverage());
-//        summary.setText(getDataList().get(getPosition()).getOverview());
 
-//        Picasso.Builder builder = new Picasso.Builder(context);
-//        builder.downloader(new OkHttp3Downloader(context));
-//        builder.build().load("https://image.tmdb.org/t/p/w185/" + movie.getPosterPath())
-//                .into(moviePoster);
+
+
+        MovieResult.Result movie = getMovie();
+        movieTitleBelowPoster.setText(movie.getTitle());
+        releaseYearView.setText(movie.getReleaseDate().substring(0, 4));
+        ratingBar.setRating(movie.getVoteAverage());
+        summary.setText(movie.getOverview());
+        Picasso.Builder builder = new Picasso.Builder(context);
+        builder.downloader(new OkHttp3Downloader(context));
+        builder.build().load("https://image.tmdb.org/t/p/w185/" + movie.getBackdropPath())
+                .into(moviePoster);
+
 
         return rootView;
     }
+
     @Override
     public void onSaveInstanceState(Bundle currentState) {
         currentState.putSerializable("data_list", (Serializable) dataList);
-        currentState.putInt("item_position",position);
+        currentState.putInt("item_position", position);
     }
 }
