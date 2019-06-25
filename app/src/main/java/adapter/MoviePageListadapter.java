@@ -58,7 +58,7 @@ public class MoviePageListadapter extends PagedListAdapter<MovieResult.Result,Mo
         holder.txtTitle.setText(getItem(position).getTitle());
         Picasso.Builder builder = new Picasso.Builder(context);
         builder.downloader(new OkHttp3Downloader(context));
-        builder.build().load("https://image.tmdb.org/t/p/w185/"+getItem(position).getPosterPath())
+        builder.build().load("https://image.tmdb.org/t/p/w342/"+getItem(position).getPosterPath())
                 .into(holder.coverImage);
 
 
