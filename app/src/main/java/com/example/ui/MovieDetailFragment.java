@@ -1,8 +1,6 @@
 package com.example.ui;
 
 
-//import android.annotation.SuppressLint;
-
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.ColorStateList;
@@ -24,7 +22,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
-import androidx.core.app.ShareCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LiveData;
@@ -56,7 +53,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MovieDetailFragment extends Fragment implements  TrailerAdapter.TrailerItemClickListener{
+public class MovieDetailFragment extends Fragment implements TrailerAdapter.TrailerItemClickListener {
 
 
     private RecyclerView trailerRecyclerView;
@@ -83,7 +80,7 @@ public class MovieDetailFragment extends Fragment implements  TrailerAdapter.Tra
 
     private static final String BASE_URL_FOR_BACKGROUND_PATH = "https://image.tmdb.org/t/p/w342/";
     private static final String YOUTUBE_BASE_URL = "https://www.youtube.com/watch?v=";
-
+    private String trailerKey;
 
 
     @BindView(R.id.fab)
@@ -141,7 +138,7 @@ public class MovieDetailFragment extends Fragment implements  TrailerAdapter.Tra
         ButterKnife.bind(this, rootView);
         movie = new MovieResult.Result();
 
-        if(favouriteMovie !=null) {
+        if (favouriteMovie != null) {
             movie.setId(favouriteMovie.getId());
             movie.setBackdropPath(favouriteMovie.getBackdropPath());
             movie.setOverview(favouriteMovie.getOverview());
@@ -149,13 +146,13 @@ public class MovieDetailFragment extends Fragment implements  TrailerAdapter.Tra
             movie.setTitle(favouriteMovie.getTitle());
             movie.setReleaseDate(favouriteMovie.getReleaseDate());
             movie.setVoteAverage((double) favouriteMovie.getVoteAverage());
-        }else{
+        } else {
             movie = movieResult;
         }
 
-        ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
-        ((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        ((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(true);
+        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(true);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -177,8 +174,8 @@ public class MovieDetailFragment extends Fragment implements  TrailerAdapter.Tra
         moviesId.observe(this, new Observer<List<Movie>>() {
             @Override
             public void onChanged(@Nullable List<Movie> moviesData) {
-                for(int index=0; index<moviesData.size(); index++){
-                    if(((Integer) moviesData.get(index).getId()).equals((Integer) movie.getId())){
+                for (int index = 0; index < moviesData.size(); index++) {
+                    if (((Integer) moviesData.get(index).getId()).equals((Integer) movie.getId())) {
                         isfavouriteselected = true;
                         fab.setImageResource(R.drawable.ic_favorite_black_24dp);
                     }
@@ -188,7 +185,7 @@ public class MovieDetailFragment extends Fragment implements  TrailerAdapter.Tra
     }
 
     private void onClickFavourite(final MovieResult.Result mMovie) {
-        fab.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(context,R.color.whiteBackground)));
+        fab.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.whiteBackground)));
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -202,12 +199,12 @@ public class MovieDetailFragment extends Fragment implements  TrailerAdapter.Tra
                 movie.setReleaseDate(mMovie.getReleaseDate());
                 movie.setVoteAverage(mMovie.getVoteAverage());
 
-                if(isfavouriteselected){
-                    isfavouriteselected =false;
+                if (isfavouriteselected) {
+                    isfavouriteselected = false;
                     mDb.movieDao().deleteMovie(movie);
                     fab.setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.favourite_unselected));
-                }else{
-                    isfavouriteselected =true;
+                } else {
+                    isfavouriteselected = true;
                     mDb.movieDao().insert(movie);
                     fab.setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.ic_favorite_black_24dp));
                 }
@@ -217,9 +214,9 @@ public class MovieDetailFragment extends Fragment implements  TrailerAdapter.Tra
     }
 
     private void setUpToolbar() {
-        ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
-        ((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        ((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(true);
+        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(true);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -235,7 +232,7 @@ public class MovieDetailFragment extends Fragment implements  TrailerAdapter.Tra
         movieTitleBelowPoster.setText(movie.getTitle());
         String releaseYear = movie.getReleaseDate().substring(0, 4);
         releaseYearView.setText(releaseYear);
-        ratingBar.setRating(movie.getVoteAverage()/2);
+        ratingBar.setRating(movie.getVoteAverage() / 2);
         summary.setText(movie.getOverview());
         Picasso.Builder builder = new Picasso.Builder(context);
         builder.downloader(new OkHttp3Downloader(context));
@@ -246,23 +243,24 @@ public class MovieDetailFragment extends Fragment implements  TrailerAdapter.Tra
     private void performNetworkCallToFetchReview(final View rootView) {
 
         RetroFitInterface retroFitInterface = RetrofitInstance.getService();
-        Call<ReviewsData> call = retroFitInterface.getReviews(String.valueOf(movie.getId()),getString(R.string.api_key));
+        Call<ReviewsData> call = retroFitInterface.getReviews(String.valueOf(movie.getId()), getString(R.string.api_key));
         call.enqueue(new Callback<ReviewsData>() {
             @Override
             public void onResponse(Call<ReviewsData> call, Response<ReviewsData> response) {
 
-                if(response.isSuccessful()) {
+                if (response.isSuccessful()) {
 
                     ReviewsData videoDatabase = response.body();
 
                     List<ReviewsData.Review> reviewsList = videoDatabase.getResults();
-                    if(reviewsList.size()!=0){
+                    if (reviewsList.size() != 0) {
                         reviewCardView.setVisibility(View.VISIBLE);
 
                     }
                     addReviewsToRecyclerView(rootView, reviewsList);
                 }
             }
+
             @Override
             public void onFailure(Call<ReviewsData> call, Throwable t) {
                 t.printStackTrace();
@@ -276,76 +274,73 @@ public class MovieDetailFragment extends Fragment implements  TrailerAdapter.Tra
         call.enqueue(new Callback<VideoDatabase>() {
             @Override
             public void onResponse(Call<VideoDatabase> call, Response<VideoDatabase> response) {
-                if(response.isSuccessful()) {
+                if (response.isSuccessful()) {
                     VideoDatabase videoDatabase = response.body();
                     trailerList = videoDatabase.getResults();
-                    if(trailerList.size()!=0){
+                    if (trailerList.size() != 0) {
                         trailerCardView.setVisibility(View.VISIBLE);
+                        trailerKey = trailerList.get(0).getKey();
                     }
                     addTrailerToRecyclerView(view, trailerList);
-                }
-                else{
+                } else {
                     Toast.makeText(context, "Trailer did not load ", Toast.LENGTH_SHORT).show();
                 }
             }
+
             @Override
             public void onFailure(Call<VideoDatabase> call, Throwable t) {
                 t.printStackTrace();
             }
         });
+
     }
 
     void addTrailerToRecyclerView(View view, List<VideoDatabase.Result> trailerList) {
         trailerRecyclerView = view.findViewById(R.id.trailer_recycler);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(context,RecyclerView.HORIZONTAL,false);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(context, RecyclerView.HORIZONTAL, false);
         trailerRecyclerView.setLayoutManager(linearLayoutManager);
-        trailerAdapter = new TrailerAdapter(context,trailerList,this);
+        trailerAdapter = new TrailerAdapter(context, trailerList, this);
         trailerRecyclerView.setAdapter(trailerAdapter);
     }
 
     void addReviewsToRecyclerView(View view, List<ReviewsData.Review> reviewList) {
         reviewRecyclerView = view.findViewById(R.id.review_recycler);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(context,RecyclerView.VERTICAL,false);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(context, RecyclerView.VERTICAL, false);
         reviewRecyclerView.setLayoutManager(linearLayoutManager);
-        reviewAdapter = new ReviewAdapter(context,reviewList);
+        reviewAdapter = new ReviewAdapter(context, reviewList);
         reviewRecyclerView.setAdapter(reviewAdapter);
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_scrolling,menu);
+        inflater.inflate(R.menu.menu_scrolling, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.share_button){
+        String url = YOUTUBE_BASE_URL + trailerKey;
 
-            if(trailerList.size()!=0) {
+        if (url.equals("https://www.youtube.com/watch?v=null")) {
+            url = movie.getTitle();
+        }
 
-                ShareCompat.IntentBuilder.from(getActivity())
-                        .setType("video/mp4")
-                        .setChooserTitle("Share video using")
-                        .setText(YOUTUBE_BASE_URL + trailerList.get(0).getKey())
-                        .startChooser();
-//                Intent sharingIntent = new Intent(Intent.ACTION_SEND);
-//                String url = YOUTUBE_BASE_URL + trailerList.get(0).getKey();
-//                Uri videoUri = Uri.parse(url);
-//
-//                sharingIntent.setType("video/*");
-//                sharingIntent.putExtra(Intent.EXTRA_STREAM, videoUri);
-//                startActivity(Intent.createChooser(sharingIntent, "Share video using"));
-            }else{
-                Toast.makeText(getContext(),"No trailer available",Toast.LENGTH_SHORT).show();
-            }
+        Intent share = new Intent(Intent.ACTION_SEND);
+        share.setType("text/plain");
+        share.putExtra(Intent.EXTRA_TEXT, url);
+        Intent chooser = Intent.createChooser(share, "Open With");
 
+        if (share.resolveActivity(getActivity().getPackageManager()) != null) {
+            startActivity(chooser);
+        } else {
+            //Log.d("IntentFail", "not done");
         }
         return super.onOptionsItemSelected(item);
     }
 
     @Override
     public void onListItemClick(int position, List<VideoDatabase.Result> trailerList) {
-        String url = YOUTUBE_BASE_URL +trailerList.get(position).getKey();
+        String url = YOUTUBE_BASE_URL + trailerList.get(position).getKey();
         Intent implicit = new Intent(Intent.ACTION_VIEW);
         implicit.setData(Uri.parse(url));
         startActivity(implicit);
