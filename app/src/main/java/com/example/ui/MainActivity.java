@@ -1,8 +1,10 @@
-package com.example.movieretrofit;
+package com.example.ui;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+
+import com.example.movieretrofit.R;
 
 public class MainActivity extends AppCompatActivity {
 

@@ -1,9 +1,11 @@
-package com.example.movieretrofit;
+package com.example.ui;
 
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
+
+import com.example.movieretrofit.R;
 
 import data.MovieResult;
 import datapersistence.Movie;

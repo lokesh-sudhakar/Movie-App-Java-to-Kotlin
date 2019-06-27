@@ -1,22 +1,14 @@
 package datasource;
 
-import android.app.Application;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.fragment.app.FragmentManager;
 import androidx.paging.PageKeyedDataSource;
 
-import com.example.movieretrofit.MainActivity;
-import com.example.movieretrofit.MasterListFragment;
-import data.MovieResult;
-import com.example.movieretrofit.R;
-import retrofit.RetroFitInterface;
-
 import java.util.ArrayList;
-import java.util.List;
 
+import data.MovieResult;
+import retrofit.RetroFitInterface;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -51,10 +43,10 @@ public class MovieDataSource extends PageKeyedDataSource<Integer, MovieResult.Re
             @Override
             public void onResponse(Call<MovieResult> call, Response<MovieResult> response) {
                 ArrayList<MovieResult.Result> movies = new ArrayList<>();
-
+                Log.d("asdsad","fadsd");
                 if(response.body() != null && response.body().getResults() != null) {
                     movies = (ArrayList<MovieResult.Result>) response.body().getResults();
-
+                    Log.d("asdsad","fadsd");
                     callback.onResult(movies, null, FIRST_PAGE+1);
                 }
 

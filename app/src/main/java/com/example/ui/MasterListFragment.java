@@ -1,4 +1,4 @@
-package com.example.movieretrofit;
+package com.example.ui;
 
 import android.content.Context;
 import android.content.Intent;
@@ -15,6 +15,8 @@ import android.widget.Toast;
 import data.MovieResult;
 import datapersistence.Movie;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
@@ -24,6 +26,8 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+
+import com.example.movieretrofit.R;
 
 import java.util.List;
 
@@ -149,8 +153,7 @@ public class MasterListFragment extends Fragment implements MoviePageListadapter
     }
 
     @Override
-    public void onListItemClick(int position, List<datapersistence.Movie> dataList) {
-        Toast.makeText(context, "the position" + dataList.get(position).getTitle() + " clicked is  " + position, Toast.LENGTH_SHORT).show();
+    public void onFavouriteItemClick(int position, List<datapersistence.Movie> dataList) {
         Movie movie = dataList.get(position);
         Bundle bundle = new Bundle();
         bundle.putSerializable("persistence_movie", movie);
@@ -161,7 +164,7 @@ public class MasterListFragment extends Fragment implements MoviePageListadapter
 
     @Override
     public void onListItemClick(int position) {
-        Toast.makeText(context, "the position" + movies.get(position).getTitle() + " clicked is  " + position, Toast.LENGTH_SHORT).show();
+
         MovieResult.Result movie = movies.get(position);
         Bundle bundle = new Bundle();
         bundle.putSerializable("movie", movie);

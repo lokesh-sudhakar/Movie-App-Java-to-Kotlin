@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <FrameLayout android:id="@+id/movie_details_container"
-    android:name="com.example.movieretrofit.MovieDetailFragment"
+    android:name="com.example.ui.MovieDetailFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:scaleType="centerInside"
