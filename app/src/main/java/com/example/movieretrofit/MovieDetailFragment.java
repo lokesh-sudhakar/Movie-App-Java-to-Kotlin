@@ -58,19 +58,19 @@ public class MovieDetailFragment extends Fragment implements  TrailerAdapter.Tra
     private RecyclerView reviewRecyclerView;
     private ReviewAdapter reviewAdapter;
     private MovieRoomDatabase mDb;
-    private MovieResult.Result movie;
+    private MovieResult.Result movieResult;
     private Context context;
 
-    public Movie getPersistence_movie() {
-        return persistence_movie;
+    public Movie getFavouriteMovie() {
+        return favouriteMovie;
     }
 
-    public void setPersistence_movie(Movie persistence_movie) {
-        this.persistence_movie = persistence_movie;
+    public void setFavouriteMovie(Movie favouriteMovie) {
+        this.favouriteMovie = favouriteMovie;
     }
 
-    private Movie persistence_movie;
-    MovieResult.Result movies;
+    private Movie favouriteMovie;
+    MovieResult.Result movieInfo;
 
     private boolean isfavouriteselected;
 
@@ -105,12 +105,12 @@ public class MovieDetailFragment extends Fragment implements  TrailerAdapter.Tra
     public MovieDetailFragment() {
     }
 
-    public void setMovie(MovieResult.Result movie) {
-        this.movie = movie;
+    public void setMovieResult(MovieResult.Result movieResult) {
+        this.movieResult = movieResult;
     }
 
-    public MovieResult.Result getMovie() {
-        return movie;
+    public MovieResult.Result getMovieResult() {
+        return movieResult;
     }
 
     @Override
@@ -124,23 +124,23 @@ public class MovieDetailFragment extends Fragment implements  TrailerAdapter.Tra
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.movie_detail_fragment, container, false);
         ButterKnife.bind(this, rootView);
-        movies = new MovieResult.Result();
+        movieInfo = new MovieResult.Result();
 
-        if(persistence_movie!=null) {
-            movies.setId(persistence_movie.getId());
-            movies.setBackdropPath(persistence_movie.getBackdropPath());
-            movies.setOverview(persistence_movie.getOverview());
-            movies.setPosterPath(persistence_movie.getPosterPath());
-            movies.setTitle(persistence_movie.getTitle());
-            movies.setReleaseDate(persistence_movie.getReleaseDate());
-            movies.setVoteAverage((double) persistence_movie.getVoteAverage());
+        if(favouriteMovie !=null) {
+            movieInfo.setId(favouriteMovie.getId());
+            movieInfo.setBackdropPath(favouriteMovie.getBackdropPath());
+            movieInfo.setOverview(favouriteMovie.getOverview());
+            movieInfo.setPosterPath(favouriteMovie.getPosterPath());
+            movieInfo.setTitle(favouriteMovie.getTitle());
+            movieInfo.setReleaseDate(favouriteMovie.getReleaseDate());
+            movieInfo.setVoteAverage((double) favouriteMovie.getVoteAverage());
         }else{
-            movies=movie;
+            movieInfo = movieResult;
         }
 
         setUpToolbar();
         onChangePersistenceData();
-        onClickFavourite(movies);
+        onClickFavourite(movieInfo);
         setDataTOViews();
         performNetworkCallToFetchTrailer(rootView);
         performNetworkCallToFetchReview(rootView);
@@ -154,7 +154,7 @@ public class MovieDetailFragment extends Fragment implements  TrailerAdapter.Tra
             @Override
             public void onChanged(@Nullable List<Movie> moviesData) {
                 for(int index=0; index<moviesData.size(); index++){
-                    if(moviesData.get(index).getId() == movies.getId()){
+                    if(((Integer) moviesData.get(index).getId()).equals((Integer) movieInfo.getId())){
                         isfavouriteselected = true;
                         fab.setImageResource(R.drawable.ic_favorite_black_24dp);
                     }
@@ -200,26 +200,26 @@ public class MovieDetailFragment extends Fragment implements  TrailerAdapter.Tra
                 getActivity().onBackPressed();
             }
         });
-        toolbar.setTitle(movies.getTitle());
+        toolbar.setTitle(movieInfo.getTitle());
         mDb = MovieRoomDatabase.getDatabase(context);
     }
 
     private void setDataTOViews() {
-        movieTitleBelowPoster.setText(movies.getTitle());
-        String releaseYear = movies.getReleaseDate().substring(0, 4);
+        movieTitleBelowPoster.setText(movieInfo.getTitle());
+        String releaseYear = movieInfo.getReleaseDate().substring(0, 4);
         releaseYearView.setText(releaseYear);
-        ratingBar.setRating(movies.getVoteAverage()/2);
-        summary.setText(movies.getOverview());
+        ratingBar.setRating(movieInfo.getVoteAverage()/2);
+        summary.setText(movieInfo.getOverview());
         Picasso.Builder builder = new Picasso.Builder(context);
         builder.downloader(new OkHttp3Downloader(context));
-        builder.build().load(BASE_URL_FOR_BACKGROUND_PATH + movies.getBackdropPath())
+        builder.build().load(BASE_URL_FOR_BACKGROUND_PATH + movieInfo.getBackdropPath())
                 .into(moviePoster);
     }
 
     private void performNetworkCallToFetchReview(final View rootView) {
 
         RetroFitInterface retroFitInterface = RetrofitInstance.getService();
-        Call<ReviewsData> call = retroFitInterface.getReviews(String.valueOf(movies.getId()),getString(R.string.api_key));
+        Call<ReviewsData> call = retroFitInterface.getReviews(String.valueOf(movieInfo.getId()),getString(R.string.api_key));
         call.enqueue(new Callback<ReviewsData>() {
             @Override
             public void onResponse(Call<ReviewsData> call, Response<ReviewsData> response) {
@@ -244,7 +244,7 @@ public class MovieDetailFragment extends Fragment implements  TrailerAdapter.Tra
 
     private void performNetworkCallToFetchTrailer(final View view) {
         RetroFitInterface retroFitInterface = RetrofitInstance.getService();
-        Call<VideoDatabase> call = retroFitInterface.getTrailer(String.valueOf(movies.getId()), getString(R.string.api_key));
+        Call<VideoDatabase> call = retroFitInterface.getTrailer(String.valueOf(movieInfo.getId()), getString(R.string.api_key));
         call.enqueue(new Callback<VideoDatabase>() {
             @Override
             public void onResponse(Call<VideoDatabase> call, Response<VideoDatabase> response) {

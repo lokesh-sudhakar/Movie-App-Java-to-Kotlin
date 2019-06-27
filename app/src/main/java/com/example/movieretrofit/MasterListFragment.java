@@ -65,17 +65,16 @@ public class MasterListFragment extends Fragment implements MoviePageListadapter
 
         final View rootView = inflater.inflate(R.layout.fragment_master_list, container, false);
 
-        movieViewModel= ViewModelProviders.of(this).get(MovieViewModel.class);
+        movieViewModel = ViewModelProviders.of(this).get(MovieViewModel.class);
 
 
         movieViewModel.getMoviesPagedList().observe(this, new Observer<PagedList<MovieResult.Result>>() {
             @Override
-            public void onChanged( PagedList<MovieResult.Result> moviesFromLiveData) {
-                movies=moviesFromLiveData;
+            public void onChanged(PagedList<MovieResult.Result> moviesFromLiveData) {
+                movies = moviesFromLiveData;
                 showOnRecyclerView(rootView);
             }
         });
-
 
 
         favRecyclerView = rootView.findViewById(R.id.favourite_movie_recyclerView);
@@ -91,7 +90,7 @@ public class MasterListFragment extends Fragment implements MoviePageListadapter
     private void showOnRecyclerView(View view) {
 
         movieRecyclerView = view.findViewById(R.id.customRecyclerView);
-        movieAdapter = new MoviePageListadapter(context,this);
+        movieAdapter = new MoviePageListadapter(context, this);
         movieAdapter.submitList(movies);
 
         if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
@@ -109,13 +108,6 @@ public class MasterListFragment extends Fragment implements MoviePageListadapter
         movieRecyclerView.setAdapter(movieAdapter);
         movieAdapter.notifyDataSetChanged();
 
-//        movieRecyclerView = view.findViewById(R.id.customRecyclerView);
-//        movieAdapter = new MoviePageListadapter(context, this);
-//        movieAdapter.submitList(movies);
-//        movieRecyclerView.setLayoutManager(new GridLayoutManager(context, 2));
-//        movieRecyclerView.setItemAnimator(new DefaultItemAnimator());
-//        movieRecyclerView.setAdapter(movieAdapter);
-//        movieAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -128,21 +120,18 @@ public class MasterListFragment extends Fragment implements MoviePageListadapter
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_sort_by_rating: {
-                Toast.makeText(context, "Sort by rating selected ", Toast.LENGTH_SHORT).show();
                 movieViewModel.setCategory("top_rated");
                 movieRecyclerView.setVisibility(View.VISIBLE);
                 favRecyclerView.setVisibility(View.GONE);
                 return true;
             }
             case R.id.action_sort_by_popularity: {
-                Toast.makeText(context, "Sort by popularity selected ", Toast.LENGTH_SHORT).show();
                 movieViewModel.setCategory("popular");
                 movieRecyclerView.setVisibility(View.VISIBLE);
                 favRecyclerView.setVisibility(View.GONE);
                 return true;
             }
             case R.id.action_show_favourite: {
-                Toast.makeText(context, "show favourites selected ", Toast.LENGTH_SHORT).show();
                 LiveData<List<Movie>> favMovie = MovieRoomDatabase.getDatabase(context.getApplicationContext()).movieDao().getAllMovies();
                 favMovie.observe(this, new Observer<List<datapersistence.Movie>>() {
                     @Override
@@ -164,7 +153,6 @@ public class MasterListFragment extends Fragment implements MoviePageListadapter
         Toast.makeText(context, "the position" + dataList.get(position).getTitle() + " clicked is  " + position, Toast.LENGTH_SHORT).show();
         Movie movie = dataList.get(position);
         Bundle bundle = new Bundle();
-        bundle.putInt("item_position", position);
         bundle.putSerializable("persistence_movie", movie);
         Intent intent = new Intent(context, MovieDetailActivity.class);
         intent.putExtras(bundle);
@@ -176,7 +164,6 @@ public class MasterListFragment extends Fragment implements MoviePageListadapter
         Toast.makeText(context, "the position" + movies.get(position).getTitle() + " clicked is  " + position, Toast.LENGTH_SHORT).show();
         MovieResult.Result movie = movies.get(position);
         Bundle bundle = new Bundle();
-        bundle.putInt("item_position", position);
         bundle.putSerializable("movie", movie);
         Intent intent = new Intent(context, MovieDetailActivity.class);
         intent.putExtras(bundle);
