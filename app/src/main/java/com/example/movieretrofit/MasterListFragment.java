@@ -1,72 +1,48 @@
 package com.example.movieretrofit;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.graphics.Movie;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.GridView;
 import android.widget.Toast;
 
+import data.MovieResult;
+import datapersistence.Movie;
+
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.paging.PagedList;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.movieretrofit.MovieResult.Result;
 
-import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
-import adapter.CustomAdapter;
+import adapter.FavouriteMoviesAdapter;
 import adapter.MoviePageListadapter;
-import adapter.MovieViewModel;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
+import viewmodel.MovieViewModel;
+import datapersistence.MovieRoomDatabase;
 
-import static android.provider.MediaStore.Video.VideoColumns.CATEGORY;
+public class MasterListFragment extends Fragment implements MoviePageListadapter.ListItemClickListener, FavouriteMoviesAdapter.ListItemClickListener {
 
-public class MasterListFragment extends Fragment implements MoviePageListadapter.ListItemClickListener{
 
-    PagedList<Result> movies;
-    MovieViewModel movieViewModel;
-    RecyclerView recyclerView;
-    MoviePageListadapter movieAdapter;
-    CustomAdapter adapter;
-    private static final String BASE_URL = "https://api.themoviedb.org";
-    private static String CATEGORY = "popular";
-    private static String CATEGORY_TOP_RATED = "top_rated";
-    private static String API_KEY = "c4fd0359f29736975ba764defb5f2878";
-    private static String LANGUAGE = "en-US";
-    private static int PAGE = 1;
+    private PagedList<MovieResult.Result> movies;
+    private MovieViewModel movieViewModel;
+    private RecyclerView favRecyclerView;
+    private RecyclerView movieRecyclerView;
+    private MoviePageListadapter movieAdapter;
+    private MovieRoomDatabase mDb;
+    private FavouriteMoviesAdapter adapter;
     private Context context;
-
-    public List<Result> getMovieList() {
-        return movieList;
-    }
-
-    public void setMovieList(List<Result> movieList) {
-        this.movieList = movieList;
-    }
-
-    private List<Result> movieList;
 
     @Override
     public void onAttach(Context context) {
@@ -74,7 +50,6 @@ public class MasterListFragment extends Fragment implements MoviePageListadapter
         this.context = context;
     }
 
-    // Mandatory empty constructor
     public MasterListFragment() {
     }
 
@@ -84,133 +59,127 @@ public class MasterListFragment extends Fragment implements MoviePageListadapter
         setHasOptionsMenu(true);
     }
 
-    // Inflates the GridView of all AndroidMe images
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
         final View rootView = inflater.inflate(R.layout.fragment_master_list, container, false);
+
         movieViewModel= ViewModelProviders.of(this).get(MovieViewModel.class);
 
 
-        movieViewModel.getMoviesPagedList().observe(this, new Observer<PagedList<Result>>() {
+        movieViewModel.getMoviesPagedList().observe(this, new Observer<PagedList<MovieResult.Result>>() {
             @Override
-            public void onChanged( PagedList<Result> moviesFromLiveData) {
+            public void onChanged( PagedList<MovieResult.Result> moviesFromLiveData) {
                 movies=moviesFromLiveData;
                 showOnRecyclerView(rootView);
             }
         });
+
+
+
+        favRecyclerView = rootView.findViewById(R.id.favourite_movie_recyclerView);
+        adapter = new FavouriteMoviesAdapter(context, this);
+        favRecyclerView.setAdapter(adapter);
+        favRecyclerView.setLayoutManager(new GridLayoutManager(context, 2));
+
+        mDb = MovieRoomDatabase.getDatabase(context);
+
         return rootView;
     }
 
-    private void privideViewModel(final View rootView,String category) {
-        movieViewModel= ViewModelProviders.of(this).get(MovieViewModel.class);
-
-        movieViewModel.setCategory(category);
-        movieViewModel.getMoviesPagedList().observe(this, new Observer<PagedList<Result>>() {
-            @Override
-            public void onChanged( PagedList<Result> moviesFromLiveData) {
-                movies=moviesFromLiveData;
-                showOnRecyclerView(rootView);
-            }
-        });
-    }
-
-
-//    void generateDataList(View view, List<MovieResult.Result> movieList) {
-//        recyclerView = view.findViewById(R.id.customRecyclerView);
-//        recyclerView.setLayoutManager(new GridLayoutManager(context,2));
-//        MovieViewModel movieViewModel = ViewModelProviders.of(this).get(MovieViewModel.class);
-//        final MoviePageListadapter pageAdapter = new MoviePageListadapter(getContext());
-////        adapter = new CustomAdapter(context,  movieList,this);
-////        recyclerView.setAdapter(adapter);
-//        movieViewModel.moviePagedList.observe(this, new Observer<PagedList<MovieResult.Result>>() {
-//            @Override
-//            public void onChanged(PagedList<MovieResult.Result> results) {
-//
-//                pageAdapter.submitList(results);
-//            }
-//        });
-//
-//    }
-
     private void showOnRecyclerView(View view) {
 
-        recyclerView = view.findViewById(R.id.customRecyclerView);
+        movieRecyclerView = view.findViewById(R.id.customRecyclerView);
         movieAdapter = new MoviePageListadapter(context,this);
         movieAdapter.submitList(movies);
 
         if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
 
-            recyclerView.setLayoutManager(new GridLayoutManager(context, 2));
+            movieRecyclerView.setLayoutManager(new GridLayoutManager(context, 2));
         } else {
 
 
-            recyclerView.setLayoutManager(new GridLayoutManager(context, 4));
+            movieRecyclerView.setLayoutManager(new GridLayoutManager(context, 4));
 
 
         }
 
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-        recyclerView.setAdapter(movieAdapter);
+        movieRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        movieRecyclerView.setAdapter(movieAdapter);
         movieAdapter.notifyDataSetChanged();
 
+//        movieRecyclerView = view.findViewById(R.id.customRecyclerView);
+//        movieAdapter = new MoviePageListadapter(context, this);
+//        movieAdapter.submitList(movies);
+//        movieRecyclerView.setLayoutManager(new GridLayoutManager(context, 2));
+//        movieRecyclerView.setItemAnimator(new DefaultItemAnimator());
+//        movieRecyclerView.setAdapter(movieAdapter);
+//        movieAdapter.notifyDataSetChanged();
     }
-//
-//    @Override
-//    public void onListItemClick(int clickedItemIndex,List<MovieResult.Result> movieList) {
-//
-//        Bundle bundle = new Bundle();
-//        bundle.putInt("item_position",clickedItemIndex);
-//        Intent intent = new Intent(context, MovieDetailActivity.class);
-//        intent.putExtra("data_list", (Serializable) movieList);
-//        intent.putExtras(bundle);
-//        startActivity(intent);
-//        Toast.makeText(context, "the position clicked is"+clickedItemIndex+"fragment ", Toast.LENGTH_SHORT).show();
-//    }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-
         inflater.inflate(R.menu.filter_movie, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-
         switch (item.getItemId()) {
-            case R.id.action_sort_by_rating:{
+            case R.id.action_sort_by_rating: {
                 Toast.makeText(context, "Sort by rating selected ", Toast.LENGTH_SHORT).show();
                 movieViewModel.setCategory("top_rated");
+                movieRecyclerView.setVisibility(View.VISIBLE);
+                favRecyclerView.setVisibility(View.GONE);
                 return true;
             }
-            case R.id.action_sort_by_popularity:{
+            case R.id.action_sort_by_popularity: {
                 Toast.makeText(context, "Sort by popularity selected ", Toast.LENGTH_SHORT).show();
                 movieViewModel.setCategory("popular");
+                movieRecyclerView.setVisibility(View.VISIBLE);
+                favRecyclerView.setVisibility(View.GONE);
                 return true;
             }
-            case R.id.action_show_favourite :{
+            case R.id.action_show_favourite: {
                 Toast.makeText(context, "show favourites selected ", Toast.LENGTH_SHORT).show();
+                LiveData<List<Movie>> favMovie = MovieRoomDatabase.getDatabase(context.getApplicationContext()).movieDao().getAllMovies();
+                favMovie.observe(this, new Observer<List<datapersistence.Movie>>() {
+                    @Override
+                    public void onChanged(List<datapersistence.Movie> movies) {
+                        movieRecyclerView.setVisibility(View.GONE);
+                        favRecyclerView.setVisibility(View.VISIBLE);
+                        adapter.setMovies(movies);
+                        adapter.notifyDataSetChanged();
+                    }
+                });
                 return true;
             }
         }
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onListItemClick(int position, List<datapersistence.Movie> dataList) {
+        Toast.makeText(context, "the position" + dataList.get(position).getTitle() + " clicked is  " + position, Toast.LENGTH_SHORT).show();
+        Movie movie = dataList.get(position);
+        Bundle bundle = new Bundle();
+        bundle.putInt("item_position", position);
+        bundle.putSerializable("persistence_movie", movie);
+        Intent intent = new Intent(context, MovieDetailActivity.class);
+        intent.putExtras(bundle);
+        startActivity(intent);
+    }
 
     @Override
     public void onListItemClick(int position) {
-        Toast.makeText(context, "the position"+movies.get(position).getTitle()+" clicked is  "+position, Toast.LENGTH_SHORT).show();
-        Result movie= movies.get(position);
-
+        Toast.makeText(context, "the position" + movies.get(position).getTitle() + " clicked is  " + position, Toast.LENGTH_SHORT).show();
+        MovieResult.Result movie = movies.get(position);
         Bundle bundle = new Bundle();
-        bundle.putInt("item_position",position);
-        bundle.putSerializable("movie",movie);
+        bundle.putInt("item_position", position);
+        bundle.putSerializable("movie", movie);
         Intent intent = new Intent(context, MovieDetailActivity.class);
-//        intent.putExtra("data_list", movie);
         intent.putExtras(bundle);
         startActivity(intent);
-        Toast.makeText(context, "the position clicked is"+position+"fragment ", Toast.LENGTH_SHORT).show();
     }
 }

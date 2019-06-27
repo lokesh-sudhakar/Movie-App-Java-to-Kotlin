@@ -4,7 +4,7 @@
     android:id="@+id/card_view_friend"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    card_view:cardUseCompatPadding="true"
+
     >
 
 <FrameLayout android:layout_width="match_parent"
@@ -24,10 +24,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
+            android:padding="5dp"
             android:background="#07000000"
             android:textColor="#ffffff"
             android:text="Black Cops"
-            android:textSize="20dp" />
+            android:textSize="18dp" />
 
     </FrameLayout>
 

@@ -1,14 +1,13 @@
-package adapter;
-
+package data;
 
 
 import java.io.Serializable;
 import java.util.List;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class VideoDatabase implements Serializable
-{
+public class VideoDatabase implements Serializable {
 
     @SerializedName("id")
     @Expose
@@ -34,8 +33,7 @@ public class VideoDatabase implements Serializable
         this.results = results;
     }
 
-    public class Result implements Serializable
-    {
+    public class Result implements Serializable {
 
         @SerializedName("id")
         @Expose

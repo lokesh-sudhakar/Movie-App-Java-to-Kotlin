@@ -18,6 +18,10 @@ android {
         }
     }
 }
+ext {
+    roomVersion = '2.1.0-alpha06'
+    archLifecycleVersion = '2.0.0'
+}
 
 dependencies {
 
@@ -55,4 +59,12 @@ dependencies {
 
     implementation 'com.jakewharton:butterknife:10.0.0'
     annotationProcessor 'com.jakewharton:butterknife-compiler:10.0.0'
+
+    implementation "androidx.room:room-runtime:2.1.0-alpha04"
+    annotationProcessor "androidx.room:room-compiler:2.1.0-alpha04"
+    androidTestImplementation "androidx.room:room-testing:2.1.0-alpha04"
+
+    // Lifecycle components
+    implementation "androidx.lifecycle:lifecycle-extensions:2.0.0"
+    annotationProcessor "androidx.lifecycle:lifecycle-compiler:2.0.0"
 }

@@ -1,4 +1,4 @@
-package adapter;
+package datasource;
 
 import android.app.Application;
 import android.util.Log;
@@ -10,9 +10,9 @@ import androidx.paging.PageKeyedDataSource;
 
 import com.example.movieretrofit.MainActivity;
 import com.example.movieretrofit.MasterListFragment;
-import com.example.movieretrofit.MovieResult;
+import data.MovieResult;
 import com.example.movieretrofit.R;
-import com.example.movieretrofit.RetroFitInterface;
+import retrofit.RetroFitInterface;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -159,3 +159,7 @@ public class MovieDataSource extends PageKeyedDataSource<Integer, MovieResult.Re
 
     }
 }
+
+
+
+

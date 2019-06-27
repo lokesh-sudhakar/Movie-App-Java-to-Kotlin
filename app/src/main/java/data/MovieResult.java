@@ -1,4 +1,4 @@
-package com.example.movieretrofit;
+package data;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -54,7 +54,7 @@ public class MovieResult {
         this.results = results;
     }
 
-    public class Result implements Serializable
+    public static class Result implements Serializable
     {
 
         @SerializedName("vote_count")

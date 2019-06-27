@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">MovieRetroFit</string>
     <string name="title_activity_scrolling">ScrollingActivity</string>
+    <string name="api_key">"c4fd0359f29736975ba764defb5f2878"</string>
     <string name="large_text">
         "Material is the metaphor.\n\n"
 
@@ -91,4 +92,9 @@
         "when a user tries to pick up one of cards.\n\n"
     </string>
     <string name="action_settings">Settings</string>
+    <string name="default_text">TextView</string>
+    <string name="synopsis">Synopsis</string>
+    <string name="textview">TextView</string>
+    <string name="trailers">Trailers</string>
+    <string name="reviews">Reviews</string>
 </resources>

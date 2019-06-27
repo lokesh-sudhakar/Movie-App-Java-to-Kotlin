@@ -1,43 +1,42 @@
 package adapter;
 
+import datapersistence.Movie;
+import util.GradientTransformation;
 
 import android.content.Context;
-import android.graphics.Movie;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.movieretrofit.MovieResult;
 import com.example.movieretrofit.R;
 import com.jakewharton.picasso.OkHttp3Downloader;
 import com.squareup.picasso.Picasso;
 
+import java.util.Collections;
 import java.util.List;
 
-public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.CustomViewHolder> {
+public class FavouriteMoviesAdapter extends RecyclerView.Adapter<FavouriteMoviesAdapter.CustomViewHolder> {
 
-    private List<MovieResult.Result> dataList;
+    private List<Movie> movieList = Collections.emptyList();
     private Context context;
     private ListItemClickListener mOnClickListener;
+    public static final String BASE_URL_FOR_POSTERPATH = "https://image.tmdb.org/t/p/w342/";
 
     public interface ListItemClickListener {
-        void onListItemClick(int clickedItemIndex,List<MovieResult.Result> dataList);
+        void onListItemClick(int clickedItemIndex, List<Movie> dataList);
     }
 
-    public CustomAdapter(Context context,List<MovieResult.Result> dataList,ListItemClickListener listener){
+    public FavouriteMoviesAdapter(Context context, ListItemClickListener listener) {
         this.context = context;
         this.mOnClickListener = listener;
-        this.dataList = dataList;
     }
 
     class CustomViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public final View mView;
-
         TextView txtTitle;
         private ImageView coverImage;
 
@@ -49,10 +48,9 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.CustomView
             coverImage = mView.findViewById(R.id.coverImage);
             itemView.setOnClickListener(this);
         }
-
         @Override
         public void onClick(View v) {
-            mOnClickListener.onListItemClick(getAdapterPosition(), dataList);
+            mOnClickListener.onListItemClick(getAdapterPosition(), movieList);
         }
     }
 
@@ -60,23 +58,26 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.CustomView
     public CustomViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
         View view = layoutInflater.inflate(R.layout.movie_poster, parent, false);
-        ;
         return new CustomViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(CustomViewHolder holder, int position) {
-
-        holder.txtTitle.setText(dataList.get(position).getTitle());
-
+        holder.txtTitle.setText(movieList.get(position).getTitle());
         Picasso.Builder builder = new Picasso.Builder(context);
         builder.downloader(new OkHttp3Downloader(context));
-        builder.build().load("https://image.tmdb.org/t/p/w185/"+dataList.get(position).getPosterPath())
+        builder.build().load(BASE_URL_FOR_POSTERPATH + movieList.get(position).getPosterPath())
+                .transform(new GradientTransformation())
                 .into(holder.coverImage);
+    }
+
+    public void setMovies(List<Movie> movies) {
+        movieList = movies;
+        notifyDataSetChanged();
     }
 
     @Override
     public int getItemCount() {
-        return dataList.size();
+        return movieList.size();
     }
 }
