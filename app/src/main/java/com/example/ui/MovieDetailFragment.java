@@ -4,6 +4,7 @@ package com.example.ui;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.ColorStateList;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -81,6 +82,7 @@ public class MovieDetailFragment extends Fragment implements TrailerAdapter.Trai
     private static final String BASE_URL_FOR_BACKGROUND_PATH = "https://image.tmdb.org/t/p/w342/";
     private static final String YOUTUBE_BASE_URL = "https://www.youtube.com/watch?v=";
     private String trailerKey;
+    private boolean mTwoPane;
 
 
     @BindView(R.id.fab)
@@ -136,8 +138,12 @@ public class MovieDetailFragment extends Fragment implements TrailerAdapter.Trai
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.movie_detail_fragment, container, false);
         ButterKnife.bind(this, rootView);
-        movie = new MovieResult.Result();
+        if (savedInstanceState != null) {
+            movie = (MovieResult.Result) savedInstanceState.getSerializable("movie");
+        }
 
+        movie = new MovieResult.Result();
+        mDb = MovieRoomDatabase.getDatabase(context);
         if (favouriteMovie != null) {
             movie.setId(favouriteMovie.getId());
             movie.setBackdropPath(favouriteMovie.getBackdropPath());
@@ -150,22 +156,24 @@ public class MovieDetailFragment extends Fragment implements TrailerAdapter.Trai
             movie = movieResult;
         }
 
-        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(true);
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                getActivity().onBackPressed();
+        if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+            mTwoPane = false;
+            setUpToolbar(savedInstanceState);
+            if (savedInstanceState == null) {
+                onChangePersistenceData();
+                onClickFavourite(movie);
+                setDataTOViews(savedInstanceState);
+                performNetworkCallToFetchTrailer(rootView);
+                performNetworkCallToFetchReview(rootView);
             }
-        });
-        setUpToolbar();
-        onChangePersistenceData();
-        onClickFavourite(movie);
-        setDataTOViews();
-        performNetworkCallToFetchTrailer(rootView);
-        performNetworkCallToFetchReview(rootView);
-
+        } else {
+            mTwoPane = true;
+            onChangePersistenceData();
+            onClickFavourite(movie);
+            setDataTOViews(savedInstanceState);
+            performNetworkCallToFetchTrailer(rootView);
+            performNetworkCallToFetchReview(rootView);
+        }
         return rootView;
     }
 
@@ -213,31 +221,37 @@ public class MovieDetailFragment extends Fragment implements TrailerAdapter.Trai
         });
     }
 
-    private void setUpToolbar() {
-        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(true);
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                getActivity().onBackPressed();
+    private void setUpToolbar(Bundle savedInstanceState) {
+        if (savedInstanceState == null) {
+            if (!mTwoPane) {
+                toolbar.setTitle(movie.getTitle());
+                ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+                ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+                ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(true);
+                toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        getActivity().onBackPressed();
+                    }
+                });
             }
-        });
-        toolbar.setTitle(movie.getTitle());
-        mDb = MovieRoomDatabase.getDatabase(context);
+        }
     }
 
 
-    private void setDataTOViews() {
-        movieTitleBelowPoster.setText(movie.getTitle());
-        String releaseYear = movie.getReleaseDate().substring(0, 4);
-        releaseYearView.setText(releaseYear);
-        ratingBar.setRating(movie.getVoteAverage() / 2);
-        summary.setText(movie.getOverview());
-        Picasso.Builder builder = new Picasso.Builder(context);
-        builder.downloader(new OkHttp3Downloader(context));
-        builder.build().load(BASE_URL_FOR_BACKGROUND_PATH + movie.getBackdropPath())
-                .into(moviePoster);
+    private void setDataTOViews(Bundle savedInstanceState) {
+
+            movie = (MovieResult.Result) savedInstanceState.getSerializable("movie");
+            movieTitleBelowPoster.setText(movie.getTitle());
+            String releaseYear = movie.getReleaseDate().substring(0, 4);
+            releaseYearView.setText(releaseYear);
+            ratingBar.setRating(movie.getVoteAverage() / 2);
+            summary.setText(movie.getOverview());
+            Picasso.Builder builder = new Picasso.Builder(context);
+            builder.downloader(new OkHttp3Downloader(context));
+            builder.build().load(BASE_URL_FOR_BACKGROUND_PATH + movie.getBackdropPath())
+                    .into(moviePoster);
+
     }
 
     private void performNetworkCallToFetchReview(final View rootView) {
@@ -319,22 +333,23 @@ public class MovieDetailFragment extends Fragment implements TrailerAdapter.Trai
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        String url = YOUTUBE_BASE_URL + trailerKey;
+        if(item.getItemId()==R.id.share_button){
+            String url = YOUTUBE_BASE_URL + trailerKey;
 
-        if (url.equals("https://www.youtube.com/watch?v=null")) {
-            url = movie.getTitle();
+            if (url.equals("https://www.youtube.com/watch?v=null")) {
+                url = movie.getTitle();
+            }
+
+            Intent share = new Intent(Intent.ACTION_SEND);
+            share.setType("text/plain");
+            share.putExtra(Intent.EXTRA_TEXT, url);
+            Intent chooser = Intent.createChooser(share, "Share using");
+
+            if (share.resolveActivity(getActivity().getPackageManager()) != null) {
+                startActivity(chooser);
+            }
         }
 
-        Intent share = new Intent(Intent.ACTION_SEND);
-        share.setType("text/plain");
-        share.putExtra(Intent.EXTRA_TEXT, url);
-        Intent chooser = Intent.createChooser(share, "Open With");
-
-        if (share.resolveActivity(getActivity().getPackageManager()) != null) {
-            startActivity(chooser);
-        } else {
-            //Log.d("IntentFail", "not done");
-        }
         return super.onOptionsItemSelected(item);
     }
 
@@ -344,5 +359,10 @@ public class MovieDetailFragment extends Fragment implements TrailerAdapter.Trai
         Intent implicit = new Intent(Intent.ACTION_VIEW);
         implicit.setData(Uri.parse(url));
         startActivity(implicit);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle currentState) {
+        currentState.putSerializable("movie", movie);
     }
 }

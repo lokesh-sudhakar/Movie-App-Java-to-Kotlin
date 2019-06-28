@@ -12,13 +12,12 @@ import androidx.paging.PagedListAdapter;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
-
-import data.MovieResult;
-import util.GradientTransformation;
-
 import com.example.movieretrofit.R;
 import com.jakewharton.picasso.OkHttp3Downloader;
 import com.squareup.picasso.Picasso;
+
+import data.MovieResult;
+import util.GradientTransformation;
 
 public class MoviePageListadapter extends PagedListAdapter<MovieResult.Result, MoviePageListadapter.MovieViewHolder> {
 
@@ -53,6 +52,7 @@ public class MoviePageListadapter extends PagedListAdapter<MovieResult.Result, M
         builder.build().load(BASE_URL_FOR_POSTERPATH + getItem(position).getPosterPath())
                 .transform(new GradientTransformation())
                 .into(holder.coverImage);
+
     }
 
     private static DiffUtil.ItemCallback<MovieResult.Result> DIFF_CALLBACK =

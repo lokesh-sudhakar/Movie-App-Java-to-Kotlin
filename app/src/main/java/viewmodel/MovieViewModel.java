@@ -7,12 +7,12 @@ import androidx.lifecycle.LiveData;
 import androidx.paging.LivePagedListBuilder;
 import androidx.paging.PagedList;
 
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+
 import data.MovieResult;
 import datasource.MovieDataSource;
 import datasource.MovieDataSourceFactory;
-
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 
 @SuppressWarnings("unchecked")
 public class MovieViewModel extends AndroidViewModel {
@@ -31,7 +31,7 @@ public class MovieViewModel extends AndroidViewModel {
     public MovieViewModel(Application application) {
         super(application);
 
-        movieDataSourceFactory = new MovieDataSourceFactory();
+        movieDataSourceFactory = new MovieDataSourceFactory(application);
         movieDataSourceLiveData = movieDataSourceFactory.getMutableLiveData();
         PagedList.Config config = (new PagedList.Config.Builder())
                 .setEnablePlaceholders(true)

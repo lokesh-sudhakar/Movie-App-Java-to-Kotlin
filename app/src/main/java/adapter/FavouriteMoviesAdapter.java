@@ -27,7 +27,7 @@ public class FavouriteMoviesAdapter extends RecyclerView.Adapter<FavouriteMovies
     public static final String BASE_URL_FOR_POSTERPATH = "https://image.tmdb.org/t/p/w342/";
 
     public interface ListItemClickListener {
-        void onFavouriteItemClick(int clickedItemIndex, List<Movie> dataList);
+        void onFavouritePosterClick(int clickedItemIndex, List<Movie> dataList);
     }
 
     public FavouriteMoviesAdapter(Context context, ListItemClickListener listener) {
@@ -50,7 +50,7 @@ public class FavouriteMoviesAdapter extends RecyclerView.Adapter<FavouriteMovies
         }
         @Override
         public void onClick(View v) {
-            mOnClickListener.onFavouriteItemClick(getAdapterPosition(), movieList);
+            mOnClickListener.onFavouritePosterClick(getAdapterPosition(), movieList);
         }
     }
 
