@@ -48,11 +48,11 @@ public class MovieDataSource extends PageKeyedDataSource<Integer, MovieResult.Re
         call.enqueue(new Callback<MovieResult>() {
             @Override
             public void onResponse(Call<MovieResult> call, Response<MovieResult> response) {
-                ArrayList<MovieResult.Result> movies = new ArrayList<>();
-                Log.d("asdsad", "fadsd");
+                ArrayList<MovieResult.Result> movies;
+
                 if (response.body() != null && response.body().getResults() != null) {
                     movies = (ArrayList<MovieResult.Result>) response.body().getResults();
-                    Log.d("asdsad", "fadsd");
+                 
                     callback.onResult(movies, null, FIRST_PAGE + 1);
 
                 }
