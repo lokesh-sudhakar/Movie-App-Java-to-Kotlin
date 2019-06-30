@@ -20,8 +20,8 @@ import data.VideoDatabase;
 
 public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.TrailerViewHolder> {
 
-    public static final String TRAILER_THUMBNAIL_BASE_LINK = "https://img.youtube.com/vi/";
-    public static final String FILE_NAME = "/sddefault.jpg";
+    private static final String TRAILER_THUMBNAIL_BASE_LINK = "https://img.youtube.com/vi/";
+    private static final String FILE_NAME = "/sddefault.jpg";
     private List<VideoDatabase.Result> trailerList;
     private Context context;
     private TrailerItemClickListener onTrailerClickListner;

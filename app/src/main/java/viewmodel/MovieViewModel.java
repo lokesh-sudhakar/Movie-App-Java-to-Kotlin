@@ -1,9 +1,11 @@
 package viewmodel;
 
 import android.app.Application;
+import android.util.Log;
 
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 import androidx.paging.LivePagedListBuilder;
 import androidx.paging.PagedList;
 
@@ -18,7 +20,18 @@ import datasource.MovieDataSourceFactory;
 public class MovieViewModel extends AndroidViewModel {
 
     LiveData<MovieDataSource> movieDataSourceLiveData;
+    private MutableLiveData<MovieResult.Result> firstMovie = new MutableLiveData<>();
     private Executor executor;
+    private boolean firstMovieLoaded =false;
+    public boolean isFirstMovieLoaded() {
+        return firstMovieLoaded;
+    }
+
+    public void setFirstMovieLoaded(boolean firstMovieLoaded) {
+        this.firstMovieLoaded = firstMovieLoaded;
+    }
+
+
 
     public String getCategory() {
         return category;
@@ -27,6 +40,17 @@ public class MovieViewModel extends AndroidViewModel {
     private String category;
     private MovieDataSourceFactory movieDataSourceFactory;
     public LiveData<PagedList<MovieResult.Result>> moviePagedList;
+
+    public MutableLiveData<MovieResult.Result> getFirstMovie() {
+        return firstMovie;
+    }
+
+    public void setFirstMovie(MovieResult.Result firstMovie) {
+        Log.d("movie loaded in on bind view","movie" +firstMovie.toString());
+        this.firstMovie.postValue(firstMovie);
+//        this.firstMovie = firstMovie;
+    }
+
 
     public MovieViewModel(Application application) {
         super(application);
@@ -45,6 +69,7 @@ public class MovieViewModel extends AndroidViewModel {
                 .setFetchExecutor(executor)
                 .build();
     }
+
 
     public void setCategory(String category) {
         this.category = category;

@@ -26,6 +26,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.movieretrofit.R;
 
 import java.util.List;
+import java.util.Objects;
 
 import adapter.FavouriteMoviesAdapter;
 import adapter.MoviePageListadapter;
@@ -36,7 +37,7 @@ import viewmodel.MovieViewModel;
 
 public class MasterListFragment extends Fragment implements MoviePageListadapter.ListItemClickListener, FavouriteMoviesAdapter.ListItemClickListener {
 
-
+    private static final String MOVIE_FROM_LIST_FRAGMENT = "movie_from list_fragment";
     private PagedList<MovieResult.Result> movies;
     private MovieViewModel movieViewModel;
     private RecyclerView favRecyclerView;
@@ -47,7 +48,9 @@ public class MasterListFragment extends Fragment implements MoviePageListadapter
     private Context context;
     private MovieDetailFragment movieDetailFragment;
     private boolean mTwoPane;
+    private int scrollItemPosition;
     ProgressDialog progressDialog;
+    FragmentManager fragmentManager;
 
     OnPosterClickListner onPosterClickListner;
 
@@ -99,12 +102,44 @@ public class MasterListFragment extends Fragment implements MoviePageListadapter
         } else {
             mTwoPane = true;
             Log.d("twopane ", "working");
+            movieDetailFragment = new MovieDetailFragment();
+            if (mTwoPane){
+                movieViewModel.getFirstMovie().observe(this, new Observer<MovieResult.Result>() {
+                    @Override
+                    public void onChanged(MovieResult.Result result) {
+                        movieDetailFragment = new MovieDetailFragment();
+                        movieDetailFragment.setMovieResult(result);
+                        fragmentManager = Objects.requireNonNull(getActivity()).getSupportFragmentManager();
+                        fragmentManager.beginTransaction().replace(R.id.movie_details_container, movieDetailFragment).commit();
+                    }
+                });
+            }
         }
+
+
 
         addFavouriteMoviesToRecyclerView(rootView);
 
+
+
         mDb = MovieRoomDatabase.getDatabase(context);
         return rootView;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (mTwoPane){
+        movieViewModel.getFirstMovie().observe(this, new Observer<MovieResult.Result>() {
+            @Override
+            public void onChanged(MovieResult.Result result) {
+                Log.d("movie reached on changed","yes"+result.toString());
+
+                movieDetailFragment.setMovieResult(result);
+                getFragmentManager().beginTransaction().replace(R.id.movie_details_container, movieDetailFragment).commit();
+            }
+        });
+        }
     }
 
     private void addFavouriteMoviesToRecyclerView(View rootView) {
@@ -112,15 +147,17 @@ public class MasterListFragment extends Fragment implements MoviePageListadapter
         adapter = new FavouriteMoviesAdapter(context, this);
         favRecyclerView.setAdapter(adapter);
         favRecyclerView.setLayoutManager(new GridLayoutManager(context, 2));
-
     }
 
     private void showMoviesOnRecyclerView(View view) {
 
         movieRecyclerView = view.findViewById(R.id.customRecyclerView);
-        movieAdapter = new MoviePageListadapter(context, this);
+        movieAdapter = new MoviePageListadapter(getActivity(), this,movieViewModel);
         movieAdapter.submitList(movies);
-        movieRecyclerView.setLayoutManager(new GridLayoutManager(context, 2));
+        GridLayoutManager mGridlayoutManager = new GridLayoutManager(context, 2);
+        scrollItemPosition = mGridlayoutManager.findFirstVisibleItemPosition();
+        mGridlayoutManager.scrollToPosition(scrollItemPosition);
+        movieRecyclerView.setLayoutManager(mGridlayoutManager);
         movieRecyclerView.setItemAnimator(new DefaultItemAnimator());
         movieRecyclerView.setAdapter(movieAdapter);
         movieAdapter.notifyDataSetChanged();
@@ -139,6 +176,8 @@ public class MasterListFragment extends Fragment implements MoviePageListadapter
             case R.id.action_sort_by_rating: {
                 progressDialog.show();
                 movieViewModel.setCategory("top_rated");
+                movieViewModel.setFirstMovieLoaded(false);
+
                 movieRecyclerView.setVisibility(View.VISIBLE);
                 favRecyclerView.setVisibility(View.GONE);
                 return true;
@@ -146,8 +185,10 @@ public class MasterListFragment extends Fragment implements MoviePageListadapter
             case R.id.action_sort_by_popularity: {
                 progressDialog.show();
                 movieViewModel.setCategory("popular");
+                movieViewModel.setFirstMovieLoaded(false);
                 movieRecyclerView.setVisibility(View.VISIBLE);
                 favRecyclerView.setVisibility(View.GONE);
+
                 return true;
             }
             case R.id.action_show_favourite: {
@@ -170,25 +211,33 @@ public class MasterListFragment extends Fragment implements MoviePageListadapter
     @Override
     public void onFavouritePosterClick(int position, List<datapersistence.Movie> dataList) {
         Movie movie = dataList.get(position);
+        if (mTwoPane) {
+            Log.d("error in movies while in two pane", "" + movie.getId());
+            movieDetailFragment = new MovieDetailFragment();
+            movieDetailFragment.setFavouriteMovie(movie);
+            FragmentManager fragmentManager = Objects.requireNonNull(getActivity()).getSupportFragmentManager();
+            fragmentManager.beginTransaction().replace(R.id.movie_details_container, movieDetailFragment).commit();
+        }else{
         Bundle bundle = new Bundle();
         bundle.putSerializable("persistence_movie", movie);
         Intent intent = new Intent(context, MovieDetailActivity.class);
         intent.putExtras(bundle);
-        startActivity(intent);
+        startActivity(intent);}
     }
 
     @Override
     public void onListItemClick(int position) {
         MovieResult.Result movie = movies.get(position);
         if (mTwoPane) {
-            Log.d("error in movies", "" + movie.getId());
+            Log.d("error in movies while in two pane", "" + movie.getId());
             movieDetailFragment = new MovieDetailFragment();
             movieDetailFragment.setMovieResult(movie);
-            FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+            FragmentManager fragmentManager = Objects.requireNonNull(getActivity()).getSupportFragmentManager();
             fragmentManager.beginTransaction().replace(R.id.movie_details_container, movieDetailFragment).commit();
         } else {
+            Log.d("error in movies in single pane", "" + movie.getId());
             Bundle bundle = new Bundle();
-            bundle.putSerializable("movie", movie);
+            bundle.putSerializable(MOVIE_FROM_LIST_FRAGMENT, movie);
             Intent intent = new Intent(context, MovieDetailActivity.class);
             intent.putExtras(bundle);
             startActivity(intent);

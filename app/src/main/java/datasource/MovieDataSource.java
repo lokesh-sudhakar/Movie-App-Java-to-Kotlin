@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 import androidx.paging.PageKeyedDataSource;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 import data.MovieResult;
 import retrofit.RetroFitInterface;
@@ -15,6 +16,7 @@ import retrofit.RetrofitInstance;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import security.SecuredData;
 
 
 public class MovieDataSource extends PageKeyedDataSource<Integer, MovieResult.Result> {
@@ -23,8 +25,6 @@ public class MovieDataSource extends PageKeyedDataSource<Integer, MovieResult.Re
 
     private static final int FIRST_PAGE = 1;
     private static String CATEGORY = "popular";
-    private static final String BASE_URL = "https://api.themoviedb.org";
-    private static String API_KEY = "c4fd0359f29736975ba764defb5f2878";
     private static String LANGUAGE = "en-US";
     private static int PAGE = 1;
 
@@ -38,13 +38,10 @@ public class MovieDataSource extends PageKeyedDataSource<Integer, MovieResult.Re
 
     @Override
     public void loadInitial(@NonNull LoadInitialParams<Integer> params, @NonNull final LoadInitialCallback<Integer, MovieResult.Result> callback) {
-//        Retrofit retrofit = new Retrofit.Builder()
-//                .baseUrl(BASE_URL)
-//                .addConverterFactory(GsonConverterFactory.create())
-//                .build();
+
         RetroFitInterface retroFitInterface = RetrofitInstance.getService();
 
-        Call<MovieResult> call = retroFitInterface.getMovies(CATEGORY, API_KEY, LANGUAGE, PAGE);
+        Call<MovieResult> call = retroFitInterface.getMovies(CATEGORY, SecuredData.API_KEY, LANGUAGE, PAGE);
         call.enqueue(new Callback<MovieResult>() {
             @Override
             public void onResponse(Call<MovieResult> call, Response<MovieResult> response) {
@@ -52,7 +49,7 @@ public class MovieDataSource extends PageKeyedDataSource<Integer, MovieResult.Re
 
                 if (response.body() != null && response.body().getResults() != null) {
                     movies = (ArrayList<MovieResult.Result>) response.body().getResults();
-                 
+
                     callback.onResult(movies, null, FIRST_PAGE + 1);
 
                 }
@@ -69,14 +66,11 @@ public class MovieDataSource extends PageKeyedDataSource<Integer, MovieResult.Re
 
     @Override
     public void loadBefore(@NonNull final LoadParams<Integer> params, @NonNull final LoadCallback<Integer, MovieResult.Result> callback) {
-//        Retrofit retrofit = new Retrofit.Builder()
-//                .baseUrl(BASE_URL)
-//                .addConverterFactory(GsonConverterFactory.create())
-//                .build();
+
         RetroFitInterface retroFitInterface = RetrofitInstance.getService();
 
 
-        Call<MovieResult> call = retroFitInterface.getMovies(CATEGORY, API_KEY, LANGUAGE, params.key);
+        Call<MovieResult> call = retroFitInterface.getMovies(CATEGORY, SecuredData.API_KEY, LANGUAGE, params.key);
         call.enqueue(new Callback<MovieResult>() {
             @Override
             public void onResponse(Call<MovieResult> call, Response<MovieResult> response) {
@@ -97,17 +91,13 @@ public class MovieDataSource extends PageKeyedDataSource<Integer, MovieResult.Re
 
     @Override
     public void loadAfter(@NonNull final LoadParams<Integer> params, @NonNull final LoadCallback<Integer, MovieResult.Result> callback) {
-//        Retrofit retrofit = new Retrofit.Builder()
-//                .baseUrl(BASE_URL)
-//                .addConverterFactory(GsonConverterFactory.create())
-//                .build();
         RetroFitInterface retroFitInterface = RetrofitInstance.getService();
 
-        Call<MovieResult> call = retroFitInterface.getMovies(CATEGORY, API_KEY, LANGUAGE, params.key);
+        Call<MovieResult> call = retroFitInterface.getMovies(CATEGORY,SecuredData.API_KEY, LANGUAGE, params.key);
         call.enqueue(new Callback<MovieResult>() {
             @Override
             public void onResponse(Call<MovieResult> call, Response<MovieResult> response) {
-                long nextKey = (params.key == response.body().getTotalResults()) ? null : params.key + 1;
+                long nextKey = (Objects.equals(params.key, response.body().getTotalResults())) ? null : params.key + 1;
                 if (response.isSuccessful()) {
                     callback.onResult(response.body().getResults(), (int) nextKey);
                 }

@@ -1,10 +1,13 @@
 package data;
 
+import androidx.lifecycle.LiveData;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
 import java.util.List;
+
 
 public class MovieResult {
 
@@ -54,7 +57,7 @@ public class MovieResult {
         this.results = results;
     }
 
-    public static class Result implements Serializable
+    public static class Result extends LiveData<Result> implements Serializable
     {
 
         @SerializedName("vote_count")
@@ -62,6 +65,8 @@ public class MovieResult {
         private Integer voteCount;
         @SerializedName("id")
         @Expose
+//        @PrimaryKey
+//        @OnConflictStrategy
         private Integer id;
         @SerializedName("video")
         @Expose
@@ -86,6 +91,7 @@ public class MovieResult {
         private String originalTitle;
         @SerializedName("genre_ids")
         @Expose
+//        @Ignore
         private List<Integer> genreIds = null;
         @SerializedName("backdrop_path")
         @Expose
@@ -99,6 +105,7 @@ public class MovieResult {
         @SerializedName("release_date")
         @Expose
         private String releaseDate;
+
         private final static long serialVersionUID = 4244349405580365208L;
 
         public Integer getVoteCount() {

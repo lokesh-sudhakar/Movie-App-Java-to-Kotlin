@@ -18,6 +18,7 @@ import java.util.List;
 
 import datapersistence.Movie;
 import util.GradientTransformation;
+import viewmodel.MovieViewModel;
 
 public class FavouriteMoviesAdapter extends RecyclerView.Adapter<FavouriteMoviesAdapter.CustomViewHolder> {
 
@@ -25,6 +26,7 @@ public class FavouriteMoviesAdapter extends RecyclerView.Adapter<FavouriteMovies
     private Context context;
     private ListItemClickListener mOnClickListener;
     public static final String BASE_URL_FOR_POSTERPATH = "https://image.tmdb.org/t/p/w342/";
+    public MovieViewModel viewModel;
 
     public interface ListItemClickListener {
         void onFavouritePosterClick(int clickedItemIndex, List<Movie> dataList);
@@ -63,6 +65,7 @@ public class FavouriteMoviesAdapter extends RecyclerView.Adapter<FavouriteMovies
 
     @Override
     public void onBindViewHolder(CustomViewHolder holder, int position) {
+
         holder.txtTitle.setText(movieList.get(position).getTitle());
         Picasso.Builder builder = new Picasso.Builder(context);
         builder.downloader(new OkHttp3Downloader(context));
